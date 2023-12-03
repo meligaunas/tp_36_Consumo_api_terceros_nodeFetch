@@ -7,28 +7,26 @@ const moment = require('moment');
 const fetch = require('node-fetch');
 const { error } = require('console');
 
-const Movies = db.Movie;
+//-------Para usar Api------///
+/* const Movies = db.Movie;
 const Genres = db.Genre;
 const Actors = db.Actor;
 const API = 'http://www.omdbapi.com/?apikey=3f49f52d';
-
+ */
 
 const moviesController = {
-  list: (req, res) => {
-
-    
-    /*const movies = db.Movie.findAll({
+  list: (req, res) => { 
+    const movies = db.Movie.findAll({
       include: ["genre"],
-      
     })
     const genres = db.Genre.findAll({
         order : ['name']
     })
     Promise.all([movies, genres])
     .then(([movies, genres]) => {
-      res.render("moviesList", { movies, genres });
-    });*/
-      db.Movie.findAndCountAll({
+      res.render("moviesList", { movies, genres, result : 0 });
+    });
+      /*db.Movie.findAndCountAll({
         include: ["genre"],
         limit : req.query.limit,
         offset : req.skip
@@ -45,7 +43,7 @@ const moviesController = {
           pagesCount,
           currentPage :req.query.page
         });
-      });
+      });*/
     },
 
   detail: (req, res) => {
@@ -263,9 +261,8 @@ db.Actor_Movie.destroy({
         }
       }
     }).then(movies => {
-      return res.render("moviesList", { movies})
-    }).catch(error => console.log(error))
-    
+      return res.render("moviesList", { movies, result : 1});
+    }).catch(error => console.log(error))    
   }
 };
 

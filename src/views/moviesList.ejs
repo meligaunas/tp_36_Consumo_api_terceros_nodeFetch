@@ -20,12 +20,7 @@
                 </div>
               </nav>
 
-              <form action="/movies/search" method="GET" class="d-flex ">
-                <div class="input-group mb-3">
-                  <input type="text" class="form-control" name="keyword">
-                  <button class="btn btn-outline-dark" type="submit"><i class="fa fa-search"></i></button>
-                </div>
-              </form>
+            
 
               <div class="pagination">
                 <% if (paginate.hasPreviousPages || paginate.hasNextPages(pagesCount)) { %>
@@ -52,13 +47,13 @@
                                   
               </div>
 
-              <!-- <div class="buscar-titulo">
+              <div class="buscar-titulo">
                             <form action="/movies/buscar" method="GET">
                                 <input type="text" name="titulo" id="titulo">
                                 <button class="boton-buscar" type="submit">Buscar una Pelicula</button>
                             </form>
                             
-                        </div>  -->
+                        </div>  
 
             </div>
             <br>

@@ -11,7 +11,7 @@
                   Agregar Película
                   </div>
     <section class="car-body">
-        <form action="/movies/create" method="POST" class="row">
+        <form action="/movies/create" method="POST" class="row" enctype="multipart/form-data">
             <div class="mb-3 col-12 col-md-6">
                 <label for="title" class="form-label">Titulo </label>
                 <input type="text" class="form-control" name="title" id="title" required>
@@ -40,6 +40,11 @@
                     <option value="<%= genre.id %>"><%= genre.name %></option>
                     <% }) %>
                 </select>
+            </div>
+
+            <div class="mb-3 col-12 col-md-6">
+                <label for="formFile" class="form-label">Cargar Image</label>
+                <input class="form-control" type="file" id="formFile" name="image">
             </div>
 
             <div class="mb-3 col-12">

@@ -1,20 +1,22 @@
-const path = require('path');
+
 const db = require('../database/models');
+const paginate = require('express-paginate');
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
 const moment = require('moment');
 const fetch = require('node-fetch');
 const { error } = require('console');
 
-//Aqui tienen una forma de llamar a cada uno de los modelos
-// const {Movies,Genres,Actor} = require('../database/models');
 const Movies = db.Movie;
 const Genres = db.Genre;
 const Actors = db.Actor;
-/*const API = 'http://www.omdbapi.com/?apikey=3f49f52d';*/
+const API = 'http://www.omdbapi.com/?apikey=3f49f52d';
+
+
 const moviesController = {
   list: (req, res) => {
 
+    
     /*const movies = db.Movie.findAll({
       include: ["genre"],
       
@@ -26,17 +28,26 @@ const moviesController = {
     .then(([movies, genres]) => {
       res.render("moviesList", { movies, genres });
     });*/
-      db.Movie.findAll({
+      db.Movie.findAndCountAll({
         include: ["genre"],
         limit : req.query.limit,
         offset : req.skip
-      }).then((movies) => {
+      }).then(({count, rows}) => {
+
+        const pagesCount = Math.ceil(count / req.query.limit)
+
+        console.log(pagesCount);
+
         return res.render("moviesList", { 
-          movies,
-          pages : req.pages
+          movies : rows,
+          pages : paginate.getArrayPages(req)(pagesCount, pagesCount, req.query.page), 
+          paginate,
+          pagesCount,
+          currentPage :req.query.page
         });
       });
     },
+
   detail: (req, res) => {
     db.Movie.findByPk(req.params.id).then((movie) => {
       return res.render("moviesDetail", { movie, moment });
@@ -60,6 +71,8 @@ const moviesController = {
       res.render("recommendedMovies.ejs", { movies });
     });
   },
+  
+  //----------- buscar por API-----------//
   'buscar': (req, res) => {
     const title = req.query.titulo;
 
@@ -77,6 +90,8 @@ const moviesController = {
         .catch(error => console.log(error))
            
 },
+
+
   //Aqui dispongo las rutas para trabajar con el CRUD
   add: function (req, res) {
     const actors = db.Actor.findAll({
@@ -98,9 +113,10 @@ const moviesController = {
       })
       .catch((error) => console.log(error));
   },
+  
   create: function (req, res) {
     const { title, rating, awards, release_date, length, genre_id} = req.body;
-
+    const actors = [req.body.actors].flat();
     db.Movie.create({
       title: title.trim(),
       rating,
@@ -108,8 +124,9 @@ const moviesController = {
       release_date,
       length,
       genre_id,
+      image : req.file ? req.file.filename : null
     })
-      .then(() => {
+      .then((movie) => {
         if(actors){
           const actorsDB = actors.map(actor => {
               return {
@@ -236,6 +253,20 @@ db.Actor_Movie.destroy({
   })
  }).catch((error) => console.log(error))
   },
+  search :(req,res) => {
+    const keyword = req.query.keyword
+
+    db.Movie.findAll({
+      where : {
+        title : {
+          [Op.substring] : keyword
+        }
+      }
+    }).then(movies => {
+      return res.render("moviesList", { movies})
+    }).catch(error => console.log(error))
+    
+  }
 };
 
 module.exports = moviesController;
